@@ -140,7 +140,11 @@ function App() {
 								/>
 							</>
 						)}
-						<audio ref={audioRef} src="/alarm.mp3" loop />
+						<audio
+							ref={audioRef}
+							src={import.meta.env.BASE_URL + "alarm.mp3"}
+							loop
+						/>
 					</div>
 				</ShowOnHover>
 			</Container>
