@@ -61,7 +61,9 @@ function App() {
 				const now = DateTime.now().toFormat("HH:mm");
 				if (now == alarmTime) {
 					setColour({ hex: alarmColour });
-					audioRef.current?.play();
+					if (soundEnabled) {
+						audioRef.current?.play();
+					}
 					clearInterval(interval);
 				}
 			}, 500);
@@ -71,7 +73,7 @@ function App() {
 
 	useEffect(() => {
 		if (!alarmEnabled) {
-			if (soundEnabled && audioRef.current) {
+			if (audioRef.current) {
 				audioRef.current.pause();
 				audioRef.current.currentTime = 0;
 			}
