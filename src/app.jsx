@@ -48,6 +48,7 @@ function App() {
 
 	const [alarmColour, setAlarmColour] = useState("#FFFFFF");
 	const [alarmEnabled, setAlarmEnabled] = useState(false);
+	const [soundEnabled, setSoundEnabled] = useState(true);
 	const [alarmTime, setAlarmTime] = useState("00:00");
 
 	useEffect(() => {
@@ -70,12 +71,12 @@ function App() {
 
 	useEffect(() => {
 		if (!alarmEnabled) {
-			if (audioRef.current) {
+			if (soundEnabled && audioRef.current) {
 				audioRef.current.pause();
 				audioRef.current.currentTime = 0;
 			}
 		}
-	}, [alarmEnabled]);
+	}, [alarmEnabled, soundEnabled]);
 
 	return (
 		<>
@@ -127,17 +128,33 @@ function App() {
 						}}
 					>
 						<h5>
-							<input
-								type="checkbox"
-								value={alarmEnabled}
-								onChange={(e) =>
-									setAlarmEnabled(e.target.checked)
-								}
-							/>{" "}
-							Enable alarm?
+							<label>
+								<input
+									type="checkbox"
+									checked={alarmEnabled}
+									onChange={(e) =>
+										setAlarmEnabled(e.target.checked)
+									}
+								/>{" "}
+								Enable alarm?
+							</label>
 						</h5>
 						{alarmEnabled && (
 							<>
+								<h5>
+									<label>
+										<input
+											type="checkbox"
+											checked={soundEnabled}
+											onChange={(e) =>
+												setSoundEnabled(
+													e.target.checked
+												)
+											}
+										/>{" "}
+										Enable sound?
+									</label>
+								</h5>
 								<h5>Alarm time:</h5>
 								<input
 									type="time"
