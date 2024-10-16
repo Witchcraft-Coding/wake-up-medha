@@ -1,11 +1,14 @@
-import { useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import invert from "invert-color";
+import { DateTime } from "luxon";
+import styled from "styled-components";
+import { useColor } from "react-color-palette";
 
 import "react-color-palette/css";
 
-import "./app.css";
-import styled from "styled-components";
 import Selector from "./components/selector";
+
+import "./app.css";
 
 const Container = styled.div`
 	height: 100vh;
@@ -26,34 +29,119 @@ const ShowOnHover = styled.div`
 	}
 `;
 
+const defaultColour = "#000000";
+
 function App() {
-	const [colour, setColour] = useState("#FFFFFF");
-	const [invertedColour, setInvertedColour] = useState(invert(colour, true));
+	/**
+	 * @type {import("react").MutableRefObject<HTMLAudioElement | null>}
+	 */
+	const audioRef = useRef(null);
+	const [colour, setColour] = useColor(defaultColour);
+	const invertedColour = useMemo(
+		() => invert(colour?.hex ?? colour, true),
+		[colour]
+	);
+
+	const [alarmColour, setAlarmColour] = useState("#FFFFFF");
+	const [alarmEnabled, setAlarmEnabled] = useState(false);
+	const [alarmTime, setAlarmTime] = useState("00:00");
+
+	useEffect(() => {
+		if (alarmEnabled) {
+			const interval = setInterval(() => {
+				const now = DateTime.now().toFormat("HH:mm");
+				if (now == alarmTime) {
+					setColour({ hex: alarmColour });
+					audioRef.current?.play();
+					clearInterval(interval);
+				}
+			}, 500);
+			return () => interval && clearInterval(interval);
+		}
+	}, [alarmEnabled, alarmTime, alarmColour, setColour]);
+
+	useEffect(() => {
+		if (!alarmEnabled) {
+			if (audioRef.current) {
+				audioRef.current.pause();
+				audioRef.current.currentTime = 0;
+			}
+		}
+	}, [alarmEnabled]);
 
 	return (
 		<>
 			<Container
 				style={{
-					backgroundColor: colour,
+					backgroundColor: colour.hex,
 					color: invertedColour,
 				}}
 			>
 				<ShowOnHover
 					style={{
 						width: "min(200px, 95vw)",
-						height: "200px",
 						display: "flex",
 						flexDirection: "column",
-						gap: "0",
-						border: `2px solid ${invertedColour}`,
-						borderRadius: "12px",
+						gap: "10px",
 					}}
 				>
-					<Selector
-						initColour="#FFFFFF"
-						setColour={setColour}
-						setInvertedColour={setInvertedColour}
-					/>
+					<div
+						style={{
+							display: "flex",
+							flexDirection: "column",
+							gap: "0",
+							height: "250px",
+						}}
+					>
+						<Selector
+							defaultColour={defaultColour}
+							setColour={setColour}
+						/>
+					</div>
+					<div
+						style={{
+							display: "flex",
+							flexDirection: "column",
+							gap: "0",
+						}}
+					>
+						<h5>Alarm colour:</h5>
+						<input
+							value={alarmColour}
+							onChange={(e) => setAlarmColour(e.target.value)}
+						/>
+					</div>
+					<div
+						style={{
+							display: "flex",
+							flexDirection: "column",
+							gap: "0",
+						}}
+					>
+						<h5>
+							<input
+								type="checkbox"
+								value={alarmEnabled}
+								onChange={(e) =>
+									setAlarmEnabled(e.target.checked)
+								}
+							/>{" "}
+							Enable alarm?
+						</h5>
+						{alarmEnabled && (
+							<>
+								<h5>Alarm time:</h5>
+								<input
+									type="time"
+									value={alarmTime}
+									onChange={(e) =>
+										setAlarmTime(e.target.value)
+									}
+								/>
+							</>
+						)}
+						<audio ref={audioRef} src="/alarm.mp3" loop />
+					</div>
 				</ShowOnHover>
 			</Container>
 		</>
