@@ -1,11 +1,11 @@
-import { useMemo } from "react";
-import { Hue, Saturation, useColor } from "react-color-palette";
+import { useState } from "react";
 import invert from "invert-color";
 
 import "react-color-palette/css";
 
-import "./App.css";
+import "./app.css";
 import styled from "styled-components";
+import Selector from "./components/selector";
 
 const Container = styled.div`
 	height: 100vh;
@@ -27,18 +27,14 @@ const ShowOnHover = styled.div`
 `;
 
 function App() {
-	const [colour, setColour] = useColor("white");
-	const invertedColour = useMemo(
-		() => invert(colour.hex, true),
-		[colour],
-		[colour.hex]
-	);
+	const [colour, setColour] = useState("#FFFFFF");
+	const [invertedColour, setInvertedColour] = useState(invert(colour, true));
 
 	return (
 		<>
 			<Container
 				style={{
-					backgroundColor: colour.hex,
+					backgroundColor: colour,
 					color: invertedColour,
 				}}
 			>
@@ -53,20 +49,11 @@ function App() {
 						borderRadius: "12px",
 					}}
 				>
-					<Saturation
-						height={200}
-						color={colour}
-						onChange={setColour}
+					<Selector
+						initColour="#FFFFFF"
+						setColour={setColour}
+						setInvertedColour={setInvertedColour}
 					/>
-					<div
-						style={{
-							padding: "3px",
-							backgroundColor: colour.hex,
-						}}
-					>
-						<Hue color={colour} onChange={setColour} />
-					</div>
-					{colour.hex}
 				</ShowOnHover>
 			</Container>
 		</>
