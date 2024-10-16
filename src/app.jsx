@@ -3,6 +3,7 @@ import invert from "invert-color";
 import { DateTime } from "luxon";
 import styled from "styled-components";
 import { useColor } from "react-color-palette";
+import { useWakeLock } from "react-screen-wake-lock";
 
 import "react-color-palette/css";
 
@@ -41,10 +42,17 @@ function App() {
 		() => invert(colour?.hex ?? colour, true),
 		[colour]
 	);
+	const { request: requestWakeLock } = useWakeLock({
+		onRequest: () => console.log("Wake lock requested."),
+	});
 
 	const [alarmColour, setAlarmColour] = useState("#FFFFFF");
 	const [alarmEnabled, setAlarmEnabled] = useState(false);
 	const [alarmTime, setAlarmTime] = useState("00:00");
+
+	useEffect(() => {
+		requestWakeLock();
+	}, [requestWakeLock]);
 
 	useEffect(() => {
 		if (alarmEnabled) {
