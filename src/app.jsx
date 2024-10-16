@@ -69,7 +69,7 @@ function App() {
 			}, 500);
 			return () => interval && clearInterval(interval);
 		}
-	}, [alarmEnabled, alarmTime, alarmColour, setColour]);
+	}, [alarmEnabled, alarmTime, alarmColour, setColour, soundEnabled]);
 
 	useEffect(() => {
 		if (!alarmEnabled) {
